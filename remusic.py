@@ -4,7 +4,12 @@ import yt_dlp
 import asyncio
 import os
 
-TOKEN = 'OTQxNDE0NTczNzE2NzAxMTk1.YgVmpQ.uWm2Zp_1arAbzwnh4UwfxeqMv_A'
+from src.config import Config
+config = Config().read()
+
+
+
+TOKEN = config['TOKEN']
 
 queues = {}
 
