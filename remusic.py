@@ -1,34 +1,17 @@
+# -*- coding: utf-8 -*-
 from discord.ext import commands, tasks
+from src import check_queue as cq
+from src.config import Config
+from src import get_url
 import discord
-import yt_dlp
 import asyncio
 import os
 
-TOKEN = 'OTQxNDE0NTczNzE2NzAxMTk1.YgVmpQ.uWm2Zp_1arAbzwnh4UwfxeqMv_A'
+
+config = Config().read()
+TOKEN = config['TOKEN']
 
 queues = {}
-
-yt_dlp.utils.bug_reports_message = lambda: ''
-
-ytdl_format_options = {
-    'format': 'bestaudio/best',
-    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
-    'restrictfilenames': True,
-    'noplaylist': True,
-    'nocheckcertificate': True,
-    'ignoreerrors': False,
-    'logtostderr': False,
-    'quiet': True,
-    'no_warnings': True,
-    'default_search': 'auto',
-    'source_address': '0.0.0.0'
-}
-
-ffmpeg_options = {
-    'options': '-vn'
-}
-
-ytdl = yt_dlp.YoutubeDL(ytdl_format_options)
 
 client = commands.Bot(command_prefix='$')
 
@@ -44,31 +27,15 @@ class YTDLSource(discord.PCMVolumeTransformer):
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+        data = await loop.run_in_executor(None, lambda: cq.ytdl.extract_info(url, download=not stream))
 
         if 'entries' in data:
             data = data['entries'][0]
 
-        filename = data['url'] if stream else ytdl.prepare_filename(data)
+        filename = data['url'] if stream else cq.ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(
             executable="C:/Users/Geanluca/Downloads/ffmpeg-n4.4-latest-win64-gpl-4.4/bin/ffmpeg.exe",
-            source=filename, **ffmpeg_options), data=data)
-
-
-def check_queues(ctx, id):
-    if queues[id] != []:
-        server1 = ctx.message.guild
-        voice = server1.voice_client
-        id = ctx.message.guild.id
-        source = queues[id]
-        filename = ytdl.prepare_filename(source[0].data)
-        queues[id].pop(0)
-
-        if len(queues[789156365460832287]) > 0:
-            voice.play(source[0], after=lambda x=None: check_queues(ctx, id))
-            os.remove(filename)
-        else:
-            queues.pop(789156365460832287)
+            source=filename, **cq.ffmpeg_options), data=data)
 
 
 @client.event
@@ -100,7 +67,23 @@ async def leave(ctx):
 
 @client.command(name='play', help='This command plays the song.')
 async def play(ctx):
-    url = (ctx.message.content.split('$play '))[1]
+    search = (ctx.message.content.split('$play '))[1]
+    if 'https://' in search:
+        url_watch = search
+    else:
+        data = get_url.get_html_page(search.replace(' ', '+'))
+        results = get_url.get_names_search(data)
+        msg = ''
+        for x in range(0, 5):
+           msg += f"{(get_url.info_results(data))[x]} \n"
+        await ctx.send(msg)
+
+        def check(msg): return msg.author == ctx.author and msg.channel == ctx.channel
+
+        choice = await client.wait_for("message", check=check)
+        url_watch = get_url.get_url_watch((results[0][int(choice.content) - 1]))
+
+
     if not ctx.message.author.voice:
         await ctx.send("You are not connected to a voice channel.")
         return
@@ -125,11 +108,11 @@ async def play(ctx):
     voice_channel = server.voice_client
 
     async with ctx.typing():
-        player = await YTDLSource.from_url(url, loop=client.loop)
+        player = await YTDLSource.from_url(url_watch, loop=client.loop)
         guild_id = ctx.message.guild.id
 
         if not queues:
-            voice_channel.play(player, after=lambda x=None: check_queues(ctx, guild_id))
+            voice_channel.play(player, after=lambda x=None: cq.check_queues(ctx, guild_id))
             await ctx.send('Now playing: **{}**!'.format(player.title))
         else:
             pass
@@ -167,12 +150,12 @@ async def skip(ctx):
     voice_client.pause()
     voice = server1.voice_client
     source = queues[id]
-    filename = ytdl.prepare_filename(source[0].data)
+    filename = cq.ytdl.prepare_filename(source[0].data)
     queues[id].pop(0)
     await ctx.send('Song Skipped!')
 
     if len(queues[789156365460832287]) > 0:
-        voice.play(source[0], after=lambda x=None: check_queues(ctx, id))
+        voice.play(source[0], after=lambda x=None: cq.check_queues(ctx, id))
         await ctx.send('Now playing: **{}**  '.format(source[0].title))
         os.remove(filename)
     else:
@@ -192,7 +175,7 @@ async def change_status():
 client.run(TOKEN)
 
 """
-1 - Make the queue/play accept playlists.   youtube-dl -i -f mp4 --yes-playlist 'https://www.youtube.com/watch?v=7Vy8970q0Xc&list=PLwJ2VKmefmxpUJEGB1ff6yUZ5Zd7Gegn2'
+1 - Make the queue/play accept playlists.  
 
 2 - Improve the search by writing. Maybe make the same way that the mp3 downloader. (5 options to the user pick 1.).  (Done)
 Obs: The url search is working fine. 
