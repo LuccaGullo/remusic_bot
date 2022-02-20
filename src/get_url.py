@@ -13,6 +13,7 @@ def get_names_search(data):
     code_search = data.split('{"url":"/watch?v=')
     code_results = []
     name_results = []
+
     for n in range(1, 6):
         code_results.append(code_search[n].split('","webPageType"')[0])
         name_results.append(video_search[n].split('"}],"accessibility"')[0])
@@ -30,5 +31,8 @@ def info_results(data):
     video = []
     video_search = data.split('"title":{"runs":[{"text":"')
     for n in range(1, 6):
-        video.append(f"""**{n}**: {video_search[n].split('"}],"accessibility"')[0]}""")
+        tsb = data.split('{"text":{"accessibility":{"accessibilityData":{"label":"')
+        tsm = tsb[n].split(',"simpleText":"')
+        tsa = tsm[1].split('"},')
+        video.append(f"""**{n}**: {video_search[n].split('"}],"accessibility"')[0]}  ({tsa[0]})""")
     return video
