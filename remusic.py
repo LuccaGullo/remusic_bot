@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 import shutil
-
 from discord.ext import commands, tasks
 from src import ytdl_infos as yt
 from src.config import Config
 from src import get_url
 import discord
 import asyncio
-import os
 
 
 config = Config().read()
@@ -82,9 +80,9 @@ async def leave(ctx):
     await ctx.voice_client.disconnect()
 
 
-@client.command(name='p', help='This command plays the song.')
-async def p(ctx):
-    search = (ctx.message.content.split(',p '))[1].encode("ascii","ignore").decode()
+@client.command(name='play', help='This command plays the song.')
+async def play(ctx):
+    search = (ctx.message.content.split(',play '))[1].encode("ascii","ignore").decode()
 
     if 'https://' in search:
         url_watch = search
@@ -159,8 +157,8 @@ async def pause(ctx):
     await voice_client.pause()
 
 
-@client.command(name='s', help='This command skips the actual song and plays the next one on the queue.')
-async def s(ctx):
+@client.command(name='skip', help='This command skips the actual song and plays the next one on the queue.')
+async def skip(ctx):
     id = ctx.message.guild.id
     server1 = ctx.message.guild
     voice_client = ctx.message.guild.voice_client
