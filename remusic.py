@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import shutil
+
 from discord.ext import commands, tasks
 from src import ytdl_infos as yt
 from src.config import Config
@@ -50,6 +52,7 @@ def check_queues(ctx, id):
             voice.play(source[0], after=lambda x=None: check_queues(ctx, id))
         else:
             queues.pop(789156365460832287)
+            shutil.rmtree(yt.songs_path)
 
 
 @client.event
@@ -104,7 +107,6 @@ async def p(ctx):
     if not ctx.message.author.voice:
         await ctx.send("You are not connected to a voice channel.")
         return
-
     else:
         channel = ctx.message.author.voice.channel
 
@@ -165,14 +167,12 @@ async def s(ctx):
     voice_client.pause()
     voice = server1.voice_client
     source = queues[id]
-    filename = yt.ytdl.prepare_filename(source[0].data)
     queues[id].pop(0)
     await ctx.send('Song Skipped!')
 
     if len(queues[789156365460832287]) > 0:
         voice.play(source[0], after=lambda x=None: check_queues(ctx, id))
         await ctx.send('Now playing: **{}**  '.format(source[0].title))
-        os.remove(filename)
     else:
         queues.pop(789156365460832287)
 
@@ -187,11 +187,7 @@ client.run(TOKEN)
 """
 1 - Make the queue/play accept playlists.  
 
-2 - Delete the file after the song is over.
-filename = yt.ytdl.prepare_filename(source[0].data)
-os.remove(filename)
-
-3 - Make bot disconnect after 10 minutes idle.    
+2 - Make bot disconnect after 10 minutes idle.    
 if queues == {}:
     await asyncio.sleep(300)
     await ctx.send("Bot disconnected because it's idle for a long time")

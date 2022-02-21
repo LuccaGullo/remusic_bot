@@ -1,11 +1,11 @@
 import yt_dlp
 
-
 yt_dlp.utils.bug_reports_message = lambda: ''
 
 ytdl_format_options = {
     'format': 'bestaudio/best',
-    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'outtmpl': 'C:/Users/Geanluca/PycharmProjects/remusic_bot/Songs/'
+               '%(extractor)s-%(id)s-%(title)s.%(ext)s',
     'restrictfilenames': True,
     'noplaylist': True,
     'nocheckcertificate': True,
@@ -20,5 +20,7 @@ ytdl_format_options = {
 ffmpeg_options = {
     'options': '-vn'
 }
+
+songs_path = 'C:/Users/Geanluca/PycharmProjects/remusic_bot/Songs'
 
 ytdl = yt_dlp.YoutubeDL(ytdl_format_options)
