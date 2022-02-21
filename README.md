@@ -5,7 +5,7 @@ Remusic is an open source, Discord Music bot that is constantly growing. If you 
 
 ## ❗ Required Libs
 
-```http
+```
   pip install PyNaCl
   pip install yt-dlp
   pip install discord
@@ -24,7 +24,7 @@ Remusic is an open source, Discord Music bot that is constantly growing. If you 
 ● New commands\
 ● New discord features \
 ● Bug fixes \
-● Code optimisation 
+● Code optimization 
 
 
 
