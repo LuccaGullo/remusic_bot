@@ -19,7 +19,7 @@ Remusic is an open source, Discord Music bot that is constantly growing. If you 
 ## ❗ Commands
 #### - 🎵Music: `play`, `pause`, `resume`, `skip`, `stop` 
 #### - 🔎Useful: `help`, `ping`, `join`, `leave`
-#### -  And more to come!
+#### - ❓ And more to come!
 ## 📝 To-Do
 ● New commands\
 ● New discord features \
