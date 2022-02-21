@@ -1,2 +1,3 @@
 heroku ps:scale worker=1
+heroku buildpacks:set heroku/python
 worker: python remusic.py
