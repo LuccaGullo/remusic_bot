@@ -1,5 +1,5 @@
 
-# Discord Music Bot
+# Remusic
 
 Remusic is an open source, Discord Music bot that is constantly growing. If you liked this repository, feel free to leave a star ⭐ to help promote Remusic!
 
