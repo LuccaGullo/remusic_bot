@@ -38,6 +38,12 @@ class YTDLSource(discord.PCMVolumeTransformer):
             source=filename, **yt.ffmpeg_options), data=data)
 
 
+async def idle_disconnect(ctx):
+    await ctx.voice_client.disconnect()
+    await ctx.send('**Remusic disconnected because it was inactive for too long.**')
+
+
+
 def check_queues(ctx, id):
     if queues:
         server1 = ctx.message.guild
@@ -48,9 +54,17 @@ def check_queues(ctx, id):
 
         if len(queues[789156365460832287]) > 0:
             voice.play(source[0], after=lambda x=None: check_queues(ctx, id))
+            client.loop.create_task(ctx.send('Now playing: **{}**!'.format(source[0].title)))
         else:
             queues.pop(789156365460832287)
             shutil.rmtree(yt.songs_path)
+            time = 0
+            while queues == {}:
+                asyncio.run(asyncio.sleep(1))
+                time += 1
+                if time == 900:
+                    client.loop.create_task(idle_disconnect(ctx))
+                    break
 
 
 @client.event
@@ -172,8 +186,15 @@ async def skip(ctx):
         voice.play(source[0], after=lambda x=None: check_queues(ctx, id))
         await ctx.send('Now playing: **{}**  '.format(source[0].title))
     else:
+        await ctx.send('**The queue is empty**.')
         queues.pop(789156365460832287)
-
+        time = 0
+        while queues == {}:
+            await asyncio.sleep(1)
+            time += 1
+            if time == 300:
+                await voice_client.disconnect()
+                await ctx.send('**Remusic disconnected because it was inactive for too long.**')
 
 @tasks.loop(seconds=20)
 async def change_status():
