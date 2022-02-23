@@ -6,14 +6,13 @@ Remusic is an open source, Discord Music bot that is constantly growing. If you 
 ## ❗ Required Libs
 
 ```
-  pip install PyNaCl
-  pip install yt-dlp
-  pip install discord
-  pip install discord.py[voice]
-  pip install asyncio
+  pip install -r requirements.txt     
 ```
 
+## How to run
 
+1. Copy the .env_example file and rename to .env   
+2. Set token variable
 
 
 ## ❗ Commands
