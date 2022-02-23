@@ -2,14 +2,13 @@
 import shutil
 from discord.ext import commands, tasks
 from src import ytdl_infos as yt
-from src.config import Config
+from prettyconf import config
 from src import get_url
 import discord
 import asyncio
 
 
-config = Config().read()
-TOKEN = config['TOKEN']
+TOKEN = config('TOKEN')
 
 queues = {}
 
@@ -41,7 +40,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
 async def idle_disconnect(ctx):
     await ctx.voice_client.disconnect()
     await ctx.send('**Remusic disconnected because it was inactive for too long.**')
-
 
 
 def check_queues(ctx, id):

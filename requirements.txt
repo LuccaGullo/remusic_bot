@@ -35,3 +35,4 @@ yarl==1.7.2
 youtube-dl==2021.12.17
 youtube-dlc==2020.11.11.post3
 yt-dlp==2022.2.4
+prettyconf==2.2.1
